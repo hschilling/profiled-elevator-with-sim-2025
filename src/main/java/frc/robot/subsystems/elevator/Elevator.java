@@ -6,8 +6,12 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.util.PIDUtil;
+
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
@@ -145,5 +149,27 @@ public class Elevator extends ProfiledPIDSubsystem {
         return command;
     }
 
+ /**
+   * Creates a new command to move the elevator based on a DoubleSupplier.
+   *
+   * @param speedSupplier A DoubleSupplier that provides the speed for the elevator.
+   * @return A new command to move the elevator.
+   */
+  public Command moveElevatorCommand(DoubleSupplier speedSupplier) {
+    return this.run(
+        () -> {
+            elevatorIO.setMotorSpeed(speedSupplier.getAsDouble());
+            System.out.println("in moveElevatorCommand with speed " + speedSupplier.getAsDouble());
+         } );
+  }
+
+  public Command stopCommand(){
+    return this.runOnce(
+        () -> {
+            elevatorIO.setMotorSpeed(0);
+            System.out.println("stop elevator");
+        }
+    );
+  }
 
 }

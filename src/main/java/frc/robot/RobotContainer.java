@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
@@ -105,14 +106,23 @@ public class RobotContainer {
                   elevator.setMotorSpeed(0.5);
                 }));
     m_driverController
-    .back() // button 7
-    .whileTrue(
-        Commands.run(
-            () -> {
-              elevator.disable();
-              elevator.setMotorSpeed(0.0);
-            }));
-            // () -> elevator.setMotorSpeed(-m_driverController.getRawAxis(1))));
+        .back() // button 7
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  elevator.disable();
+                  elevator.setMotorSpeed(0.0);
+                }));
+    // Create a Trigger that activates when the left Y joystick is moved beyond the
+    // deadband
+    Trigger leftYMovedTrigger = new Trigger(
+        () -> Math.abs(m_driverController.getLeftY()) > 0.08);
+
+    leftYMovedTrigger.whileTrue(
+        elevator.moveElevatorCommand(
+            () -> m_driverController.getLeftY())).onFalse(
+              elevator.stopCommand()
+            );// Use a lambda expression as the DoubleSupplier
 
   }
 
